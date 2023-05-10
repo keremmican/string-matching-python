@@ -72,13 +72,16 @@ def run_algorithm(algorithm, html_file, patterns):
 def main():
     html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
     patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    test_text = "<HTML><BODY>WHICH_FINALLY_HALTS. _ _ AT_THAT POINT </BODY></HTML>"
+    test_pattern = "AT_THAT"
 
     while True:
         print("Please select an algorithm:")
         print("1. Brute Force")
         print("2. Boyer-Moore")
         print("3. Horspool")
-        print("4. Exit")
+        print("4. Test text and pattern")
+        print("5. Exit")
         choice = input("Enter the number of your choice: ")
 
         if choice == "1":
@@ -88,6 +91,19 @@ def main():
         elif choice == "3":
             algorithm = Horspool()
         elif choice == "4":
+            print("Running test on specific text and pattern...\n" + "-" * 40)
+            algorithm = BruteForce()
+            start_time = time.time()
+            occurrences, comparisons = algorithm.search(test_text, test_pattern)
+            end_time = time.time()
+            running_time = end_time - start_time
+            print(f"Pattern: {test_pattern}")
+            print(f"Occurrences: {len(occurrences)}")
+            print(f"Comparisons: {comparisons}")
+            print(f"Running time: {running_time} seconds")
+            print("-" * 40)
+            continue
+        elif choice == "5":
             break
         else:
             print("Invalid choice. Please try again.")
