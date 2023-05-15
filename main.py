@@ -1,5 +1,7 @@
 import time
 from bs4 import BeautifulSoup
+import matplotlib.pyplot as plt
+import numpy as np
 
 class BruteForce:
     @staticmethod
@@ -135,7 +137,33 @@ def highlight_occurrences(html_text, pattern, occurrences):
     return html_text
 
 
+# def run_algorithm(algorithm, html_file, patterns):
+#     with open(html_file, 'r', encoding='utf-8') as file:
+#         html_text = file.read()
+#
+#     soup = BeautifulSoup(html_text, "html.parser")
+#     text = soup.get_text()
+#
+#     for pattern in patterns:
+#         start_time = time.time()
+#         occurrences, comparisons = algorithm.search(text, pattern)
+#         end_time = time.time()
+#         running_time = end_time - start_time
+#
+#         print(f"Pattern: {pattern}")
+#         print(f"Occurrences: {len(occurrences)}")
+#         print(f"Comparisons: {comparisons}")
+#         print(f"Running time: {running_time} seconds")
+#         print("-" * 40)
+#
+#         html_text = highlight_occurrences(html_text, pattern, occurrences)
+#
+#         with open(f"highlighted_{html_file}", 'w', encoding='utf-8') as file:
+#             file.write(html_text)
+
 def run_algorithm(algorithm, html_file, patterns):
+    results = {}
+
     with open(html_file, 'r', encoding='utf-8') as file:
         html_text = file.read()
 
@@ -148,6 +176,8 @@ def run_algorithm(algorithm, html_file, patterns):
         end_time = time.time()
         running_time = end_time - start_time
 
+        results[pattern] = (len(occurrences), comparisons, running_time)
+
         print(f"Pattern: {pattern}")
         print(f"Occurrences: {len(occurrences)}")
         print(f"Comparisons: {comparisons}")
@@ -159,12 +189,27 @@ def run_algorithm(algorithm, html_file, patterns):
         with open(f"highlighted_{html_file}", 'w', encoding='utf-8') as file:
             file.write(html_text)
 
+    return results
+
+def plot_results(results):
+    algorithms = ['BruteForce', 'BoyerMoore', 'Horspool']
+    html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
+    patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+
+    for pattern in patterns:
+        time_results = {algorithm: sum(results[(algorithm, html_file)][pattern][2] for html_file in html_files)
+                        for algorithm in algorithms}
+        plt.bar(time_results.keys(), time_results.values())
+        plt.ylabel('Total running time (s)')
+        plt.title(f'Total running time for pattern "{pattern}"')
+        plt.show()
 
 def main():
     html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
     patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
     test_text = "<HTML><BODY>WHICH_FINALLY_HALTS. _ _ AT_THAT POINT </BODY></HTML>"
     test_pattern = "AT_THAT"
+    results = {}
 
     while True:
         print("Please select an algorithm:")
@@ -172,15 +217,28 @@ def main():
         print("2. Boyer-Moore")
         print("3. Horspool")
         print("4. Test text and pattern")
-        print("5. Exit")
+        print("5. Run all algorithms on all HTML files")
+        print("6. Exit")
         choice = input("Enter the number of your choice: ")
 
         if choice == "1":
             algorithm = BruteForce()
+            for html_file in html_files:
+                print(f"Processing {html_file}...\n" + "-" * 40)
+                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+                print("=" * 40)
         elif choice == "2":
             algorithm = BoyerMoore()
+            for html_file in html_files:
+                print(f"Processing {html_file}...\n" + "-" * 40)
+                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+                print("=" * 40)
         elif choice == "3":
             algorithm = Horspool()
+            for html_file in html_files:
+                print(f"Processing {html_file}...\n" + "-" * 40)
+                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+                print("=" * 40)
         elif choice == "4":
             print("Running test on specific text and pattern...\n" + "-" * 40)
             algorithm = BruteForce()
@@ -193,17 +251,19 @@ def main():
             print(f"Comparisons: {comparisons}")
             print(f"Running time: {running_time} seconds")
             print("-" * 40)
-            continue
         elif choice == "5":
+            algorithms = [BruteForce(), BoyerMoore(), Horspool()]
+            for algorithm in algorithms:
+                for html_file in html_files:
+                    print(f"Processing {html_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
+                    results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+                    print("=" * 40)
+            plot_results(results)
+        elif choice == "6":
             break
         else:
             print("Invalid choice. Please try again.")
             continue
-
-        for html_file in html_files:
-            print(f"Processing {html_file}...\n" + "-" * 40)
-            run_algorithm(algorithm, html_file, patterns)
-            print("=" * 40)
 
 if __name__ == "__main__":
     main()
