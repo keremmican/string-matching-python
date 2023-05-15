@@ -23,17 +23,108 @@ class BruteForce:
 
 class BoyerMoore:
     @staticmethod
-    def search(text, pattern):
-        # TODO: Implement Boyer-Moore algorithm
-        pass
+    def preprocess_strong_suffix(shift, bpos, pattern, m):
+        i = m
+        j = m + 1
+        bpos[i] = j
 
+        while i > 0:
+            while j <= m and pattern[i - 1] != pattern[j - 1]:
+                if shift[j] == 0:
+                    shift[j] = j - i
+                j = bpos[j]
+            i -= 1
+            j -= 1
+            bpos[i] = j
+
+    @staticmethod
+    def preprocess_case2(shift, bpos, pattern, m):
+        j = bpos[0]
+        for i in range(m + 1):
+            if shift[i] == 0:
+                shift[i] = j
+            if i == j:
+                j = bpos[j]
+
+    @staticmethod
+    def search(text, pattern):
+        n = len(text)
+        m = len(pattern)
+        comparisons = 0
+        occurrences = []
+
+        shift = [0 for _ in range(m + 1)]
+        bpos = [0 for _ in range(m + 1)]
+
+        BoyerMoore.preprocess_strong_suffix(shift, bpos, pattern, m)
+        BoyerMoore.preprocess_case2(shift, bpos, pattern, m)
+
+        # Print the bad character table and good suffix table
+        print('Bad Symbol Table:')
+        for i, c in enumerate(pattern):
+            print(f'{c}: {shift[i + 1]}')
+
+        print('Good Suffix Table:')
+        for i in range(m):
+            print(f'{pattern[i:]}: {shift[i + 1]}')
+        print("\n")
+
+        s = 0
+        while s <= n - m:
+            j = m - 1
+            while j >= 0 and pattern[j] == text[s + j]:
+                comparisons += 1
+                j -= 1
+            if j < 0:
+                occurrences.append(s)
+                s += shift[0] if s + m < n else 1
+            else:
+                s += shift[j + 1]
+        return occurrences, comparisons
 
 class Horspool:
     @staticmethod
-    def search(text, pattern):
-        # TODO: Implement Horspool's algorithm
-        pass
+    def preprocess_bad_char_table(pattern):
+        m = len(pattern)
+        bad_char_table = [-1] * 256  # Assume ASCII character set
 
+        # Fill the table with the last occurrence of each character in the pattern
+        for i in range(m):
+            char_code = ord(pattern[i])
+            if char_code < 256:
+                bad_char_table[char_code] = i
+
+        return bad_char_table
+
+    @staticmethod
+    def search(text, pattern):
+        n = len(text)
+        m = len(pattern)
+        comparisons = 0
+        occurrences = []
+
+        bad_char_table = Horspool.preprocess_bad_char_table(pattern)
+
+        # Print the bad character table
+        print('Bad Symbol Table:')
+        for i, val in enumerate(bad_char_table):
+            if val != -1:
+                print(f'{chr(i)}: {val}')
+
+        print("\n")
+
+        s = 0
+        while s <= n - m:
+            j = m - 1
+            while j >= 0 and pattern[j] == text[s + j]:
+                comparisons += 1
+                j -= 1
+            if j < 0:
+                occurrences.append(s)
+                s += (m - bad_char_table[ord(text[s + m])] if s + m < n and ord(text[s + m]) < 256 else 1)
+            else:
+                s += max(1, j - bad_char_table[ord(text[s + j])] if ord(text[s + j]) < 256 else m)
+        return occurrences, comparisons
 
 def highlight_occurrences(html_text, pattern, occurrences):
     for occurrence in reversed(occurrences):
