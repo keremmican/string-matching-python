@@ -193,16 +193,22 @@ def run_algorithm(algorithm, html_file, patterns):
 
 def plot_results(results):
     algorithms = ['BruteForce', 'BoyerMoore', 'Horspool']
-    html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
-    patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
+    bit_files = ["bit_stringfile1.html", "bit_stringfile2.html", "bit_stringfile3.html"]
+    text_patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    bit_patterns = ["bit_pattern1", "bit_pattern2", "bit_pattern3"]  # Replace with your actual bit patterns
 
-    for pattern in patterns:
-        time_results = {algorithm: sum(results[(algorithm, html_file)][pattern][2] for html_file in html_files)
-                        for algorithm in algorithms}
-        plt.bar(time_results.keys(), time_results.values())
-        plt.ylabel('Total running time (s)')
-        plt.title(f'Total running time for pattern "{pattern}"')
-        plt.show()
+    all_files = text_files + bit_files
+    all_patterns = text_patterns + bit_patterns
+
+    for pattern in all_patterns:
+        for file_list in [text_files, bit_files]:
+            time_results = {algorithm: sum(results[(algorithm, html_file)][pattern][2] for html_file in file_list)
+                            for algorithm in algorithms}
+            plt.bar(time_results.keys(), time_results.values())
+            plt.ylabel('Total running time (s)')
+            plt.title(f'Total running time for pattern "{pattern}"')
+            plt.show()
 
 def main():
     text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
