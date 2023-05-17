@@ -206,7 +206,7 @@ def plot_results(results):
 
 def main():
     text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
-    bit_files = ["bit_stringfile1.html1", "bit_stringfile2.html2", "bit_stringfile3.html3"]
+    bit_files = ["bit_stringfile1.html", "bit_stringfile2.html", "bit_stringfile3.html"]
 
     text_patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
     bit_patterns = ["bit_pattern1", "bit_pattern2", "bit_pattern3"]  # Replace bit_pattern1, etc. with your actual bit patterns.
