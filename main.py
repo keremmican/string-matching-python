@@ -205,8 +205,12 @@ def plot_results(results):
         plt.show()
 
 def main():
-    html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
-    patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
+    bit_files = ["bit_stringfile1.html1", "bit_stringfile2.html2", "bit_stringfile3.html3"]
+
+    text_patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    bit_patterns = ["bit_pattern1", "bit_pattern2", "bit_pattern3"]  # Replace bit_pattern1, etc. with your actual bit patterns.
+
     test_text = "<HTML><BODY>WHICH_FINALLY_HALTS. _ _ AT_THAT POINT </BODY></HTML>"
     test_pattern = "AT_THAT"
     results = {}
@@ -221,23 +225,17 @@ def main():
         print("6. Exit")
         choice = input("Enter the number of your choice: ")
 
-        if choice == "1":
-            algorithm = BruteForce()
-            for html_file in html_files:
-                print(f"Processing {html_file}...\n" + "-" * 40)
-                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+        if choice in ["1", "2", "3"]:
+            algorithm = BruteForce() if choice == "1" else BoyerMoore() if choice == "2" else Horspool()
+
+            for text_file in text_files:
+                print(f"Processing {text_file}...\n" + "-" * 40)
+                results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
                 print("=" * 40)
-        elif choice == "2":
-            algorithm = BoyerMoore()
-            for html_file in html_files:
-                print(f"Processing {html_file}...\n" + "-" * 40)
-                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
-                print("=" * 40)
-        elif choice == "3":
-            algorithm = Horspool()
-            for html_file in html_files:
-                print(f"Processing {html_file}...\n" + "-" * 40)
-                results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+
+            for bit_file in bit_files:
+                print(f"Processing {bit_file}...\n" + "-" * 40)
+                results[(algorithm.__class__.__name__, bit_file)] = run_algorithm(algorithm, bit_file, bit_patterns)
                 print("=" * 40)
         elif choice == "4":
             print("Running test on specific text and pattern...\n" + "-" * 40)
@@ -254,10 +252,16 @@ def main():
         elif choice == "5":
             algorithms = [BruteForce(), BoyerMoore(), Horspool()]
             for algorithm in algorithms:
-                for html_file in html_files:
-                    print(f"Processing {html_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
-                    results[(algorithm.__class__.__name__, html_file)] = run_algorithm(algorithm, html_file, patterns)
+                for text_file in text_files:
+                    print(f"Processing {text_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
+                    results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
                     print("=" * 40)
+
+                for bit_file in bit_files:
+                    print(f"Processing {bit_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
+                    results[(algorithm.__class__.__name__, bit_file)] = run_algorithm(algorithm, bit_file, bit_patterns)
+                    print("=" * 40)
+
             plot_results(results)
         elif choice == "6":
             break
