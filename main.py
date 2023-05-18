@@ -61,7 +61,6 @@ class BoyerMoore:
         BoyerMoore.preprocess_strong_suffix(shift, bpos, pattern, m)
         BoyerMoore.preprocess_case2(shift, bpos, pattern, m)
 
-        # Print the bad character table and good suffix table
         print('Bad Symbol Table:')
         for i, c in enumerate(pattern):
             print(f'{c}: {shift[i + 1]}')
@@ -88,9 +87,8 @@ class Horspool:
     @staticmethod
     def preprocess_bad_char_table(pattern):
         m = len(pattern)
-        bad_char_table = [-1] * 256  # Assume ASCII character set
+        bad_char_table = [-1] * 256
 
-        # Fill the table with the last occurrence of each character in the pattern
         for i in range(m):
             char_code = ord(pattern[i])
             if char_code < 256:
@@ -107,7 +105,6 @@ class Horspool:
 
         bad_char_table = Horspool.preprocess_bad_char_table(pattern)
 
-        # Print the bad character table
         print('Bad Symbol Table:')
         for i, val in enumerate(bad_char_table):
             if val != -1:
@@ -135,31 +132,6 @@ def highlight_occurrences(html_text, pattern, occurrences):
                                                                                                             occurrence + len(
                                                                                                                 pattern):]
     return html_text
-
-
-# def run_algorithm(algorithm, html_file, patterns):
-#     with open(html_file, 'r', encoding='utf-8') as file:
-#         html_text = file.read()
-#
-#     soup = BeautifulSoup(html_text, "html.parser")
-#     text = soup.get_text()
-#
-#     for pattern in patterns:
-#         start_time = time.time()
-#         occurrences, comparisons = algorithm.search(text, pattern)
-#         end_time = time.time()
-#         running_time = end_time - start_time
-#
-#         print(f"Pattern: {pattern}")
-#         print(f"Occurrences: {len(occurrences)}")
-#         print(f"Comparisons: {comparisons}")
-#         print(f"Running time: {running_time} seconds")
-#         print("-" * 40)
-#
-#         html_text = highlight_occurrences(html_text, pattern, occurrences)
-#
-#         with open(f"highlighted_{html_file}", 'w', encoding='utf-8') as file:
-#             file.write(html_text)
 
 def run_algorithm(algorithm, html_file, patterns):
     results = {}
@@ -193,23 +165,29 @@ def run_algorithm(algorithm, html_file, patterns):
 
 def plot_results(results):
     algorithms = ['BruteForce', 'BoyerMoore', 'Horspool']
-    html_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
-    patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
+    bit_files = ["bit_stringfile1.html", "bit_stringfile2.html", "bit_stringfile3.html"]
+    text_patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
+    bit_patterns = ["0011", "1010", "1111", "010101", "00001111"]
 
-    for pattern in patterns:
-        time_results = {algorithm: sum(results[(algorithm, html_file)][pattern][2] for html_file in html_files)
-                        for algorithm in algorithms}
-        plt.bar(time_results.keys(), time_results.values())
-        plt.ylabel('Total running time (s)')
-        plt.title(f'Total running time for pattern "{pattern}"')
-        plt.show()
+    all_files = text_files + bit_files
+    all_patterns = text_patterns + bit_patterns
+
+    for pattern in all_patterns:
+        for file_list in [bit_files]:
+            time_results = {algorithm: sum(results[(algorithm, html_file)][pattern][2] for html_file in file_list)
+                            for algorithm in algorithms}
+            plt.bar(time_results.keys(), time_results.values())
+            plt.ylabel('Total running time (s)')
+            plt.title(f'Total running time for pattern "{pattern}"')
+            plt.show()
 
 def main():
     text_files = ["shakespeare.html", "war_and_peace.html", "us_cities_by_population.html"]
     bit_files = ["bit_stringfile1.html", "bit_stringfile2.html", "bit_stringfile3.html"]
 
     text_patterns = ["the", "population", "Et tu, Brute?", "Tchaikovsky", "New York"]
-    bit_patterns = ["bit_pattern1", "bit_pattern2", "bit_pattern3"]  # Replace bit_pattern1, etc. with your actual bit patterns.
+    bit_patterns = ["0011", "1010", "1111", "010101", "00001111"]  # Replace bit_pattern1, etc. with your actual bit patterns.
 
     test_text = "<HTML><BODY>WHICH_FINALLY_HALTS. _ _ AT_THAT POINT </BODY></HTML>"
     test_pattern = "AT_THAT"
@@ -229,9 +207,9 @@ def main():
             algorithm = BruteForce() if choice == "1" else BoyerMoore() if choice == "2" else Horspool()
 
             for text_file in text_files:
-                print(f"Processing {text_file}...\n" + "-" * 40)
-                results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
-                print("=" * 40)
+                 print(f"Processing {text_file}...\n" + "-" * 40)
+                 results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
+                 print("=" * 40)
 
             for bit_file in bit_files:
                 print(f"Processing {bit_file}...\n" + "-" * 40)
@@ -253,15 +231,14 @@ def main():
             algorithms = [BruteForce(), BoyerMoore(), Horspool()]
             for algorithm in algorithms:
                 for text_file in text_files:
-                    print(f"Processing {text_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
-                    results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
-                    print("=" * 40)
+                     print(f"Processing {text_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
+                     results[(algorithm.__class__.__name__, text_file)] = run_algorithm(algorithm, text_file, text_patterns)
+                     print("=" * 40)
 
                 for bit_file in bit_files:
                     print(f"Processing {bit_file} with {algorithm.__class__.__name__}...\n" + "-" * 40)
                     results[(algorithm.__class__.__name__, bit_file)] = run_algorithm(algorithm, bit_file, bit_patterns)
                     print("=" * 40)
-
             plot_results(results)
         elif choice == "6":
             break
